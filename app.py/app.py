@@ -1,8 +1,13 @@
 from flask import Flask, request, render_template, Response, session
 from PIL import Image
 import os
+
 if os.path.exists("soil_reports.db"):
     os.remove("soil_reports.db")
+
+os.environ['KAGGLE_CONFIG_DIR'] = r'C:\Users\likith\OneDrive\Desktop\crop_recommendation_system\app.py'
+
+
 import pytesseract, os, sqlite3
 saved_reports = []
 from database import extract_values, extract_all_numbers, save_to_db
