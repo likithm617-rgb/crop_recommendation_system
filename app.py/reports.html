@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="{{ t['lang_code'] }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ t['saved'] }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .report {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .report h3 {
+            margin-top: 0;
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ t['saved'] }}</h2>
+
+    {% for report in reports %}
+        <div class="report">
+            <h3>{{ t['farmer'] }}: {{ report.farmer }}</h3>
+            <p><strong>{{ t['location'] }}:</strong> {{ report.location }}</p>
+            <p><strong>{{ t['crop'] }}:</strong> {{ report.crop }}</p>
+            <p><strong>{{ t['month'] }}:</strong> {{ report.month }}</p>
+            <p><strong>{{ t['recommended'] }}:</strong> {{ report.recommendations | join(', ') }}</p>
+            <p><strong>{{ t['report'] }}:</strong></p>
+            <ul>
+                {% for warning in report.warnings %}
+                    <li class="warning">{{ warning }}</li>
+                {% endfor %}
+            </ul>
+            <p><em>{{ report.timestamp.strftime('%Y-%m-%d %H:%M') }}</em></p>
+        </div>
+    {% endfor %}
+
+    <a href="/?language={{ t['lang_code'] }}">🔙 {{ t['title'] }}</a>
+</body>
+</html>

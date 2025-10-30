@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="{{ t['lang_code'] }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t['title'] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+
+    .form-container {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 25px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+    }
+
+    input[type="submit"] {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .lang-switch {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .lang-switch a {
+      margin: 0 8px;
+      text-decoration: none;
+      color: #4CAF50;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>{{ t['title'] }}</h2>
+
+    <div class="lang-switch">
+      🌐 {{ t['title'] }} —
+      <a href="/?language=en">English</a>
+      <a href="/?language=kn">ಕನ್ನಡ</a>
+      <a href="/?language=hi">हिंदी</a>
+      <a href="/?language=te">తెలుగు</a>
+    </div>
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+      <label for="farmerName">{{ t['farmer'] }}</label>
+      <input type="text" name="farmerName" id="farmerName" required>
+
+      <label for="location">{{ t['location'] }}</label>
+      <input type="text" name="location" id="location" required>
+
+      <label for="cropType">{{ t['crop'] }}</label>
+      <input type="text" name="cropType" id="cropType" required>
+
+      <label for="sowingMonth">{{ t['month'] }}</label>
+      <select name="sowingMonth" id="sowingMonth">
+        {% for month in t['months'] %}
+          <option value="{{ loop.index0 }}">{{ month }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="soilReport">{{ t['upload'] }}</label>
+      <input type="file" name="soilReport" id="soilReport" accept="image/*" required>
+
+      <label for="language">Language</label>
+      <select name="language" id="language">
+        <option value="en" {% if t['lang_code'] == 'en' %}selected{% endif %}>English</option>
+        <option value="kn" {% if t['lang_code'] == 'kn' %}selected{% endif %}>ಕನ್ನಡ</option>
+        <option value="hi" {% if t['lang_code'] == 'hi' %}selected{% endif %}>हिंदी</option>
+        <option value="te" {% if t['lang_code'] == 'te' %}selected{% endif %}>తెలుగు</option>
+      </select>
+
+      <input type="submit" value="{{ t['submit'] }}">
+    </form>
+
+    <p class="note">Language: {{ t['lang_code'] | upper }}</p>
+  </div>
+</body>
+</html>

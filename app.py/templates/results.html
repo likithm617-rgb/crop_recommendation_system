@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="{{ t['lang_code'] }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t['recommended'] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+
+    .results-container {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 25px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #e7f5e7;
+      margin: 8px 0;
+      padding: 10px;
+      border-left: 5px solid #4CAF50;
+      font-weight: bold;
+    }
+
+    .ml-prediction {
+      background: #fff8e1;
+      margin: 12px 0;
+      padding: 10px;
+      border-left: 5px solid #ff9800;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .values p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    .warning {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .actions a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .actions a:hover {
+      background-color: #45a049;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="results-container">
+    <h2>{{ t['recommended'] }}</h2>
+
+    <ul>
+      {% for crop in translated_crops %}
+        <li>{{ crop.name }} — ₹{{ crop.price }}</li>
+      {% endfor %}
+    </ul>
+
+    <div class="ml-prediction">
+      {{ t['recommended'] }} (ML): {{ ml_prediction }} — ₹{{ ml_price }}
+    </div>
+
+    <div class="values">
+      <h3>{{ t['parsed'] }}</h3>
+      <p>{{ t['nitrogen'] }}: {{ nitrogen }}</p>
+      <p>{{ t['phosphorus'] }}: {{ phosphorus }}</p>
+      <p>{{ t['potash'] }}: {{ potash }}</p>
+      <p>{{ t['ph'] }}: {{ ph_value }}</p>
+      <p>{{ t['moisture'] }}: {{ moisture }}</p>
+    </div>
+
+    {% for warning in warnings %}
+      <p class="warning">⚠️ {{ warning }}</p>
+    {% endfor %}
+
+    <div class="actions">
+      <a href="/calculator?crop={{ crop }}&price={{ translated_crops[0].price }}&language={{ language }}">{{ t['submit'] }} → Calculator</a>
+      <a href="/reports?language={{ language }}">{{ t['saved'] }}</a>
+      <a href="/?language={{ language }}">{{ t['upload'] }}</a>
+    </div>
+
+    <p class="note">Language: {{ t['lang_code'] | upper }}</p>
+  </div>
+</body>
+</html>

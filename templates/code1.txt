@@ -1,0 +1,164 @@
+ from flask import Flask, request, render_template, Response
+from PIL import Image
+import pytesseract, os, sqlite3
+from database import extract_values, extract_all_numbers, save_to_db
+from recommendation import recommend_crops
+from market_price import get_crop_price
+
+app = Flask(__name__)
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+@app.route('/')
+def index():
+    return render_template('upload.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['soilReport']
+    farmer_name = request.form['farmerName']
+    location = request.form['location']
+    crop_type = request.form['cropType']
+    sowing_month = int(request.form['sowingMonth'])
+    language = request.form.get('language', 'en')
+
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    file.save(filepath)
+
+    text = pytesseract.image_to_string(Image.open(filepath), config='--psm 11')
+
+    translations = {
+        'en': {
+            'extracted': 'Extracted Text',
+            'parsed': 'Parsed Values',
+            'recommended': 'Recommended Crops with Market Prices',
+            'warnings': 'Warnings',
+            'saved': 'View Saved Reports',
+            'nitrogen': 'Nitrogen',
+            'phosphorus': 'Phosphorus',
+            'potash': 'Potash',
+            'ph': 'pH',
+            'moisture': 'Moisture'
+        },
+        'kn': {
+            'extracted': 'ಪಠ್ಯವನ್ನು ಹೊರತೆಗೆಯಲಾಗಿದೆ',
+            'parsed': 'ವಿಶ್ಲೇಷಿತ ಮೌಲ್ಯಗಳು',
+            'recommended': 'ಶಿಫಾರಸು ಮಾಡಿದ ಬೆಳೆಗಳು ಮತ್ತು ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳು',
+            'warnings': 'ಎಚ್ಚರಿಕೆಗಳು',
+            'saved': 'ಉಳಿಸಿದ ವರದಿಗಳನ್ನು ವೀಕ್ಷಿಸಿ',
+            'nitrogen': 'ನೈಟ್ರೋಜನ್',
+            'phosphorus': 'ಫಾಸ್ಫರಸ್',
+            'potash': 'ಪೊಟಾಶ್',
+            'ph': 'ಪಿಹೆಚ್',
+            'moisture': 'ಆದ್ರತೆ'
+        },
+        'hi': {
+            'extracted': 'निकाला गया पाठ',
+            'parsed': 'विश्लेषित मान',
+            'recommended': 'अनुशंसित फसलें और बाज़ार मूल्य',
+            'warnings': 'चेतावनी',
+            'saved': 'सहेजी गई रिपोर्ट देखें',
+            'nitrogen': 'नाइट्रोजन',
+            'phosphorus': 'फॉस्फोरस',
+            'potash': 'पोटाश',
+            'ph': 'पीएच',
+            'moisture': 'नमी'
+        }
+    }
+
+    crop_translations = {
+        'Rice': {'en': 'Rice', 'kn': 'ಅಕ್ಕಿ', 'hi': 'चावल'},
+        'Wheat': {'en': 'Wheat', 'kn': 'ಗೋಧಿ', 'hi': 'गेहूं'},
+        'Maize': {'en': 'Maize', 'kn': 'ಜೋಳ', 'hi': 'मक्का'},
+        'Finger Millet': {'en': 'Finger Millet', 'kn': 'ರಾಗಿ', 'hi': 'मंडुआ'},
+        'Soybean': {'en': 'Soybean', 'kn': 'ಸೋಯಾಬೀನ್', 'hi': 'सोयाबीन'},
+        'Groundnut': {'en': 'Groundnut', 'kn': 'ಕಡಲೆಕಾಯಿ', 'hi': 'मूंगफली'},
+        'Sugarcane': {'en': 'Sugarcane', 'kn': 'ಕಬ್ಬು', 'hi': 'गन्ना'},
+        'Sorghum': {'en': 'Sorghum', 'kn': 'ಜೋಳ', 'hi': 'ज्वार'},
+        'Banana': {'en': 'Banana', 'kn': 'ಬಾಳೆಹಣ್ಣು', 'hi': 'केला'},
+        'Chickpea': {'en': 'Chickpea', 'kn': 'ಕಡಲೆ', 'hi': 'चना'},
+        'Mustard': {'en': 'Mustard', 'kn': 'ಸಾಸಿವೆ', 'hi': 'सरसों'},
+        'Barley': {'en': 'Barley', 'kn': 'ಜೋ', 'hi': 'जौ'},
+        'Pea': {'en': 'Pea', 'kn': 'ಬಟಾಣಿ', 'hi': 'मटर'},
+        'Lentil': {'en': 'Lentil', 'kn': 'ಮಸೂರ', 'hi': 'मसूर'},
+        'Cotton': {'en': 'Cotton', 'kn': 'ಹತ್ತಿ', 'hi': 'कपास'},
+        'Watermelon': {'en': 'Watermelon', 'kn': 'ಕಲಂಗಡಿ', 'hi': 'तरबूज'},
+        'Muskmelon': {'en': 'Muskmelon', 'kn': 'ಸೌತೆಕಾಯಿ', 'hi': 'खरबूजा'},
+        'Cucumber': {'en': 'Cucumber', 'kn': 'ಸೌತೆಕಾಯಿ', 'hi': 'खीरा'},
+        'Green Gram': {'en': 'Green Gram', 'kn': 'ಹೆಸರುಕಾಳು', 'hi': 'मूंग'}
+    }
+
+    t = translations.get(language, translations['en'])
+
+    try:
+        nitrogen, phosphorus, potash, ph_value, moisture = extract_values(text)
+        save_to_db(farmer_name, location, crop_type, nitrogen, phosphorus, potash, ph_value, moisture)
+
+        recommended_crops, warnings = recommend_crops(
+            nitrogen, phosphorus, potash, ph_value, moisture, crop_type, sowing_month
+        )
+
+        translated_crops = [(crop_translations[crop][language], get_crop_price(crop)) for crop in recommended_crops]
+
+        return f"""
+        <button onclick="window.print()">🖨️</button>
+        <h2>{t['extracted']}:</h2><pre>{text}</pre>
+        <h2>{t['parsed']}:</h2>
+        <ul>
+          <li>{t['nitrogen']}: {nitrogen}</li>
+          <li>{t['phosphorus']}: {phosphorus}</li>
+          <li>{t['potash']}: {potash}</li>
+          <li>{t['ph']}: {ph_value}</li>
+          <li>{t['moisture']}: {moisture}</li>
+        </ul>
+        <h2>🌱 {t['recommended']}:</h2>
+        <ul>
+          {''.join(f'<li>{name}: ₹{price}</li>' for name, price in translated_crops)}
+        </ul>
+        <h2>⚠️ {t['warnings']}:</h2>
+        <ul>
+          {''.join(f'<li>{note}</li>' for note in warnings)}
+        </ul>
+        <p><a href='/reports'>{t['saved']}</a></p>
+        <style>@media print {{ button, a {{ display: none; }} }}</style>
+        """
+    except Exception:
+        numbers = extract_all_numbers(text)
+        return f"<h2>Detected Numbers:</h2><p>{numbers}</p><p>⚠️ Unable to auto-map values. Please verify manually.</p>"
+
+@app.route('/reports')
+def view_reports():
+    conn = sqlite3.connect('soil_reports.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM soil_reports ORDER BY id DESC')
+    rows = cursor.fetchall()
+    conn.close()
+
+    html = "<h1>Saved Reports</h1><table border='1'><tr><th>ID</th><th>Farmer</th><th>Location</th><th>Crop</th><th>N</th><th>P</th><th>K</th><th>pH</th><th>Moisture</th><th>Interpretation</th></tr>"
+    for row in rows:
+        html += f"<tr>{''.join(f'<td>{cell}</td>' for cell in row)}</tr>"
+    html += "</table><p><a href='/'>Upload another report</a></p><p><a href='/export_csv'>📤 Export as CSV</a></p>"
+    return html
+
+@app.route('/export_csv')
+def export_csv():
+    conn = sqlite3.connect('soil_reports.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM soil_reports')
+    rows = cursor.fetchall()
+    conn.close()
+
+    def generate():
+        yield 'ID,Farmer,Location,Crop,N,P,K,pH,Moisture,Interpretation\n'
+        for row in rows:
+            yield ','.join(str(cell) for cell in row) + '\n'
+
+    return Response(generate(), mimetype='text/csv',
+                    headers={"Content-Disposition": "attachment;filename=soil_reports.csv"})
+ #Launch the Flask app
+if __name__ == '__main__':
+    app.run(debug=True)

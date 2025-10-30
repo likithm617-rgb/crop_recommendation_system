@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="{{ t['lang_code'] }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ crop }} — {{ t['profit'] }} {{ t['report'] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 30px;
+    }
+
+    .result-container {
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 25px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      border-bottom: 2px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    .summary p {
+      font-size: 16px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+
+    .summary p span {
+      float: right;
+      font-weight: normal;
+    }
+
+    .actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .actions a {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .actions a:hover {
+      background-color: #45a049;
+    }
+
+    .note {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="result-container">
+    <h2>{{ crop }} — {{ t['profit'] }} Report</h2>
+
+    <div class="summary">
+      <p>{{ t['revenue'] }} <span>₹{{ revenue }}</span></p>
+      <p>{{ t['cost'] }} <span>₹{{ cost }}</span></p>
+      <p>{{ t['profit'] }} <span>₹{{ profit }}</span></p>
+      <p>{{ t['break_even'] }} <span>₹{{ break_even }}</span></p>
+    </div>
+
+    <div class="actions">
+      <a href="/?language={{ t['lang_code'] }}">{{ t['upload'] }}</a>
+      <a href="/reports?language={{ t['lang_code'] }}">{{ t['saved'] }}</a>
+      <a href="javascript:window.print()">{{ t['print'] }}</a>
+    </div>
+
+    <p class="note">Language: {{ t['lang_code'] | upper }}</p>
+  </div>
+</body>
+</html>

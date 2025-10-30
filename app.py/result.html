@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t['title'] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .summary {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+    .summary span {
+      font-weight: bold;
+    }
+    .back-button {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .back-button a {
+      background: #0078D4;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .back-button a:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>{{ t['title'] }}</h2>
+    <div class="summary">
+      <p><span>{{ t['crop'] }}:</span> {{ crop }}</p>
+      <p><span>{{ t['revenue'] }}:</span> ₹{{ revenue }}</p>
+      <p><span>{{ t['cost'] }}:</span> ₹{{ cost }}</p>
+      <p><span>{{ t['profit'] }}:</span> ₹{{ profit }}</p>
+      <p><span>{{ t['break_even'] }}:</span> ₹{{ break_even }}</p>
+    </div>
+    <div class="back-button">
+      <a href="/calculator">🔙 {{ t['submit'] }} Again</a>
+    </div>
+  </div>
+</body>
+</html>

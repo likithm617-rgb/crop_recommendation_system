@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t['recommended'] }}</title>
+</head>
+<body>
+  <h2>{{ t['recommended'] }}</h2>
+  <ul>
+    {% for crop in translated_crops %}
+      <li><strong>{{ crop.name }}</strong> — ₹{{ crop.price }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3>{{ t['parsed'] }}</h3>
+  <p>{{ t['nitrogen'] }}: {{ nitrogen }}</p>
+  <p>{{ t['phosphorus'] }}: {{ phosphorus }}</p>
+  <p>{{ t['potash'] }}: {{ potash }}</p>
+  <p>{{ t['ph'] }}: {{ ph_value }}</p>
+  <p>{{ t['moisture'] }}: {{ moisture }}</p>
+
+  {% for warning in warnings %}
+    <p style="color:red;">⚠️ {{ warning }}</p>
+  {% endfor %}
+
+  <p><a href="/calculator?crop={{ crop }}&price={{ translated_crops[0].price }}">{{ t['submit'] }} → Calculator</a></p>
+  <p><a href="/reports">{{ t['saved'] }}</a></p>
+  <p><a href="/">{{ t['upload'] }}</a></p>
+</body>
+</html>

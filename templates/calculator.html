@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profit & Cost Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8f5;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: white;
+      padding: 20px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .lang-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .lang-buttons button {
+      flex: 1;
+      padding: 10px;
+      background: #0078D4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .lang-buttons button:hover {
+      background: #005fa3;
+    }
+    button[type="submit"] {
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="title">Profit & Cost Calculator</h2>
+
+    <div class="lang-buttons">
+      <button onclick="switchLanguage('en')">English</button>
+      <button onclick="switchLanguage('kn')">ಕನ್ನಡ</button>
+      <button onclick="switchLanguage('hi')">हिन्दी</button>
+    </div>
+
+    <form action="/calculate" method="post">
+      <label id="cropLabel">Crop:</label>
+      <input type="text" name="crop" required>
+
+      <label id="yieldLabel">Expected Yield (tons/hectare):</label>
+      <input type="number" step="0.01" name="yield" required>
+
+      <label id="priceLabel">Market Price (₹/ton):</label>
+      <input type="number" step="0.01" name="price" required>
+
+      <h3 id="costsLabel">Production Costs (₹/hectare)</h3>
+      <label id="seedLabel">Seed Cost:</label>
+      <input type="number" step="0.01" name="seed" required>
+
+      <label id="fertilizerLabel">Fertilizer Cost:</label>
+      <input type="number" step="0.01" name="fertilizer" required>
+
+      <label id="laborLabel">Labor Cost:</label>
+      <input type="number" step="0.01" name="labor" required>
+
+      <label id="irrigationLabel">Irrigation Cost:</label>
+      <input type="number" step="0.01" name="irrigation" required>
+
+      <label id="equipmentLabel">Equipment Cost:</label>
+      <input type="number" step="0.01" name="equipment" required>
+
+      <input type="hidden" name="language" id="selectedLanguage" value="en">
+      <button type="submit" id="submitBtn">Calculate</button>
+    </form>
+  </div>
+
+  <script>
+    function switchLanguage(lang) {
+      document.getElementById("selectedLanguage").value = lang;
+      const labels = {
+        en: ["Profit & Cost Calculator", "Crop:", "Expected Yield (tons/hectare):", "Market Price (₹/ton):",
+             "Production Costs (₹/hectare)", "Seed Cost:", "Fertilizer Cost:", "Labor Cost:",
+             "Irrigation Cost:", "Equipment Cost:", "Calculate"],
+        kn: ["ಲಾಭ ಮತ್ತು ವೆಚ್ಚ ಲೆಕ್ಕಾಚಾರ", "ಬೆಳೆ:", "ಅಂದಾಜು ಉತ್ಪಾದನೆ (ಟನ್/ಹೆಕ್ಟೇರ್):", "ಮಾರುಕಟ್ಟೆ ಬೆಲೆ (₹/ಟನ್):",
+             "ಉತ್ಪಾದನಾ ವೆಚ್ಚಗಳು (₹/ಹೆಕ್ಟೇರ್)", "ಬೀಜ ವೆಚ್ಚ:", "ಸರ್ಜಿ ವೆಚ್ಚ:", "ಕಾರ್ಮಿಕ ವೆಚ್ಚ:",
+             "ನೀರಾವರಿ ವೆಚ್ಚ:", "ಉಪಕರಣ ವೆಚ್ಚ:", "ಲೆಕ್ಕ ಹಾಕಿ"],
+        hi: ["लाभ और लागत कैलकुलेटर", "फसल:", "अपेक्षित उत्पादन (टन/हेक्टेयर):", "बाजार मूल्य (₹/टन):",
+             "उत्पादन लागत (₹/हेक्टेयर)", "बीज लागत:", "उर्वरक लागत:", "श्रम लागत:",
+             "सिंचाई लागत:", "उपकरण लागत:", "गणना करें"]
+      };
+      const t = labels[lang];
+      document.getElementById("title").innerText = t[0];
+      document.getElementById("cropLabel").innerText = t[1];
+      document.getElementById("yieldLabel").innerText = t[2];
+      document.getElementById("priceLabel").innerText = t[3];
+      document.getElementById("costsLabel").innerText = t[4];
+      document.getElementById("seedLabel").innerText = t[5];
+      document.getElementById("fertilizerLabel").innerText = t[6];
+      document.getElementById("laborLabel").innerText = t[7];
+      document.getElementById("irrigationLabel").innerText = t[8];
+      document.getElementById("equipmentLabel").innerText = t[9];
+      document.getElementById("submitBtn").innerText = t[10];
+    }
+  </script>
+</body>
+</html>
